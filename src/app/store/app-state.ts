@@ -1,9 +1,8 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ComponentStore } from '@ngrx/component-store';
 import { CategoryService } from '../services/category.service';
-import { tap } from 'rxjs';
-import { Company, CompanyService } from '../services/company.service';
 import { Color, ColorService } from '../services/color.service';
+import { Company, CompanyService } from '../services/company.service';
 import { PriceRange, ProductService } from '../services/product.service';
 
 export type AppState = {

@@ -1,6 +1,5 @@
 import { JsonPipe } from '@angular/common';
 import { Component, effect, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BreadcrumbComponent } from '../components/breadcrumb.component';
@@ -8,19 +7,14 @@ import { DangerButtonComponent } from '../components/danger-button.component';
 import { SquareButtonComponent } from '../components/square-button.component';
 import { ProductListStore } from './list.store';
 import { AppStore } from '../store/app-state';
+import { HeaderNavComponent } from '../components/header-nav.component';
 
 @Component({
   standalone: true,
   selector: 'product-list',
-  imports: [
-    SquareButtonComponent,
-    DangerButtonComponent,
-    JsonPipe,
-    BreadcrumbComponent,
-    FormsModule,
-  ],
   providers: [ProductListStore],
   template: `
+    <app-header-nav />
     <app-breadcrumb />
     <main class="flex gap-10 container">
       <nav class="w-[200px] flex-shrink-0 flex flex-col gap-5">
@@ -74,7 +68,7 @@ import { AppStore } from '../store/app-state';
             id="price"
             [min]="priceRange$$().min"
             [max]="priceRange$$().max"
-            [value]="priceRange$$().max"
+            [ngModel]="priceRange$$().max"
           />
         </div>
         <div class="flex justify-between">
@@ -121,6 +115,14 @@ import { AppStore } from '../store/app-state';
       </section>
     </main>
   `,
+  imports: [
+    SquareButtonComponent,
+    DangerButtonComponent,
+    JsonPipe,
+    BreadcrumbComponent,
+    FormsModule,
+    HeaderNavComponent,
+  ],
 })
 export class ProductListComponent {
   router = inject(Router);
@@ -138,11 +140,13 @@ export class ProductListComponent {
 
   constructor() {
     effect(() => {
-      this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams: { search: this.searchTerm() },
-        queryParamsHandling: 'merge',
-      });
+      if (this.searchTerm()) {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { search: this.searchTerm() },
+          queryParamsHandling: 'merge',
+        });
+      }
     });
   }
 }
