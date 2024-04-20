@@ -29,9 +29,19 @@ import { HeaderNavComponent } from '../components/header-nav.component';
         <div>
           <p class="text-black font-bold tracking-widest text-sm">Category</p>
           <div class="flex flex-col gap-2">
-            <p class="underline text-sm text-[#617d98]">All</p>
+            <p
+              class="text-sm text-[#617d98]"
+              [class.underline]="!vm$$().categoryId"
+              (click)="filterCategory()"
+            >
+              All
+            </p>
             @for(category of categories$$(); track category.id) {
-            <p class=" text-sm text-[#617d98] cursor-pointer">
+            <p
+              class="text-sm text-[#617d98] cursor-pointer"
+              [class.underline]="category.id === vm$$().categoryId"
+              (click)="filterCategory(category.id)"
+            >
               {{ category.name }}
             </p>
             }
@@ -139,14 +149,26 @@ export class ProductListComponent {
   searchTerm = signal('');
 
   constructor() {
-    effect(() => {
-      if (this.searchTerm()) {
+    effect(
+      () => {
         this.router.navigate([], {
           relativeTo: this.route,
-          queryParams: { search: this.searchTerm() },
+          queryParams: { search: this.searchTerm() || null },
           queryParamsHandling: 'merge',
         });
+        this.productListStore.setFilter({ query: this.searchTerm() });
+      },
+      {
+        allowSignalWrites: true,
       }
-    });
+    );
+  }
+
+  filterCategory(categoryId?: number) {
+    console.log(
+      '🚀 ~ ProductListComponent ~ filterCategory ~ categoryId:',
+      categoryId
+    );
+    this.productListStore.setCategoryId({ categoryId });
   }
 }
