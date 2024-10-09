@@ -1,20 +1,20 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, inject } from '@angular/core';
 
-export type Category = {
+type Category = {
   name: string;
 };
 
-export type Company = {
+type Company = {
   name: string;
 };
 
-export type Color = {
+type Color = {
   name: string;
   hexValue: string;
 };
 
-export type Product = {
+type Product = {
   name: string;
   price: number;
   rating: number;

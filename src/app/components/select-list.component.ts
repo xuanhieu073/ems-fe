@@ -1,5 +1,11 @@
-import { Component, computed, input, Input, model, signal } from '@angular/core';
-import { Category } from '../services/category.service';
+import {
+  Component,
+  computed,
+  input,
+  Input,
+  model,
+  signal,
+} from '@angular/core';
 
 @Component({
   standalone: true,
@@ -26,7 +32,7 @@ import { Category } from '../services/category.service';
   `,
 })
 export class SelectListComponent {
-  categories = input.required<Category[]>(); 
+  categories = input.required<any[]>();
   selectedCategoryId = model<number | undefined>(undefined);
   // selectedCategoryId = signal<number | undefined>(undefined);
   selectedCategory = computed(() =>

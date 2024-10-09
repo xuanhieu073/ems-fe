@@ -39,7 +39,7 @@ import { RouterLink, RouterLinkActive, RouterModule, RouterConfigOptions } from 
             alt="cart"
           />
         </div>
-        <div class="flex items-center gap-x-2">
+        <a routerLink="/login" class="flex items-center gap-x-2">
           <p class="text-xl">Login</p>
           <img
             src="/assets/images/commerce/login.svg"
@@ -47,7 +47,7 @@ import { RouterLink, RouterLinkActive, RouterModule, RouterConfigOptions } from 
             height="{24}"
             alt="cart"
           />
-        </div>
+        </a>
       </div>
     </nav>
   `,

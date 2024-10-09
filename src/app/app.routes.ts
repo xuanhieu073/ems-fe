@@ -25,4 +25,27 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./login/login.component').then((m) => m.LoginComponent),
   },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./dashboard/layout.component').then(
+        (m) => m.DashboardLayoutComponent
+      ),
+    children: [
+      {
+        path: 'products',
+        loadComponent: () =>
+          import('./dashboard/products/list.component').then(
+            (m) => m.DashboardProductListComponent
+          ),
+      },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./dashboard/users/list.component').then(
+            (m) => m.DashboardUserListComponent
+          ),
+      },
+    ],
+  },
 ];

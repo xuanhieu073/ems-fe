@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Product } from '../models/product';
 
 export type PriceRange = {
   min: number;
@@ -18,11 +19,8 @@ export class ProductService {
     return this.httpClient.get<any>(this.BaseUrl);
   }
 
-  getProductsByFilter(params: {
-    query: string;
-    categoryId?: number;
-  }): Observable<any> {
-    return this.httpClient.get(`${this.BaseUrl}/filter`, {
+  getProductsByFilter(params: { query: string; categoryId?: number }) {
+    return this.httpClient.get<Product[]>(`${this.BaseUrl}/filter`, {
       params,
     });
   }

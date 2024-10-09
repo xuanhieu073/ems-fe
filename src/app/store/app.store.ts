@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { ComponentStore } from '@ngrx/component-store';
-import { Category, CategoryService } from '../services/category.service';
+import { CategoryService } from '../services/category.service';
 import { Color, ColorService } from '../services/color.service';
 import { Company, CompanyService } from '../services/company.service';
 import { PriceRange, ProductService } from '../services/product.service';
+import { Category } from '../models/category';
 
 export type AppState = {
   categories: Category[];

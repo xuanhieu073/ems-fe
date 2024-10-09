@@ -28,6 +28,27 @@
       ],
       "@spartan-ng/ui-formfield-helm": [
         ".\\ui-formfield-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-button-helm": [
+        ".\\ui-button-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-separator-helm": [
+        ".\\ui-separator-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-table-helm": [
+        ".\\ui-table-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-menu-helm": [
+        ".\\ui-menu-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-icon-helm": [
+        ".\\ui-icon-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-checkbox-helm": [
+        ".\\ui-checkbox-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-select-helm": [
+        ".\\ui-select-helm/src/index.ts"
       ]
     }
   },
