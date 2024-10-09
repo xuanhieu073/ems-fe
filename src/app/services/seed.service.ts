@@ -32,7 +32,7 @@ export class SeedService {
   private http = inject(HttpClient);
   private baseUrl = 'http://localhost:8080/api';
   private token =
-    'Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMzUxNDI0OSwiZXhwIjoxNzE0MTE5MDQ5fQ.YCYqNRtU9OGZZbSVMlbtPflRx0EonzIxzGULAW-doVgXI8ph-VAQNphu2fXs9SBk';
+    'Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcyODEzNjE0NCwiZXhwIjoxNzI4NzQwOTQ0fQ.sbXAcXZN4EofVAsutcLokVpuCwdw-jfMZKV0KuWXnQ4EEC5HVvIl5Yq6zEWvQQS8';
   private headers = {
     Authorization: this.token,
     'content-type': 'application/json',

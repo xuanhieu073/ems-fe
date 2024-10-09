@@ -1,18 +1,31 @@
 import { JsonPipe } from '@angular/common';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router
+} from '@angular/router';
 import { BreadcrumbComponent } from '../components/breadcrumb.component';
 import { DangerButtonComponent } from '../components/danger-button.component';
-import { SquareButtonComponent } from '../components/square-button.component';
-import { ProductListStore } from './list.store';
-import { AppStore } from '../store/app-state';
 import { HeaderNavComponent } from '../components/header-nav.component';
+import { SelectListComponent } from '../components/select-list.component';
+import { SquareButtonComponent } from '../components/square-button.component';
+import { AppStore } from '../store/app-state';
+import { ProductListStore } from './list.store';
 
 @Component({
   standalone: true,
   selector: 'product-list',
   providers: [ProductListStore],
+  imports: [
+    SquareButtonComponent,
+    DangerButtonComponent,
+    JsonPipe,
+    BreadcrumbComponent,
+    FormsModule,
+    HeaderNavComponent,
+    SelectListComponent
+],
   template: `
     <app-header-nav />
     <app-breadcrumb />
@@ -28,31 +41,19 @@ import { HeaderNavComponent } from '../components/header-nav.component';
         </div>
         <div>
           <p class="text-black font-bold tracking-widest text-sm">Category</p>
-          <div class="flex flex-col gap-2">
-            <p
-              class="text-sm text-[#617d98]"
-              [class.underline]="!vm$$().categoryId"
-              (click)="filterCategory()"
-            >
-              All
-            </p>
-            @for(category of categories$$(); track category.id) {
-            <p
-              class="text-sm text-[#617d98] cursor-pointer"
-              [class.underline]="category.id === vm$$().categoryId"
-              (click)="filterCategory(category.id)"
-            >
-              {{ category.name }}
-            </p>
-            }
-          </div>
+          <app-select-list [categories]="categories$$()" [(selectedCategoryId)]="selectedCategoryId"/>
         </div>
         <div>
           <p class="text-black font-bold tracking-widest text-sm rounded-sm">
             Company
           </p>
-          <select name="company" id="company" class="bg-gray-100 text-sm">
-            <option value="all">all</option>
+          <select
+            name="company"
+            id="company"
+            class="bg-gray-100 text-sm"
+            [(ngModel)]="selectedCompanyId"
+          >
+            <option value="">all</option>
             @for(company of companies$$(); track company.id) {
             <option [value]="company.id">{{ company.name }}</option>
             }
@@ -60,32 +61,36 @@ import { HeaderNavComponent } from '../components/header-nav.component';
         </div>
         <div>
           <p class="text-black font-bold tracking-widest text-sm">Colors</p>
-          <div class="flex flex-col gap-2">
-            <p class="underline text-sm text-[#617d98]">All</p>
-            @for(color of colors$$(); track color.id) {
-            <p class=" text-sm text-[#617d98] cursor-pointer">
-              {{ color.name }}
-            </p>
-            }
-          </div>
+          <app-select-list [categories]="colors$$()" [(selectedCategoryId)]="selectedColorId"/>
         </div>
         <div class="felx flex-col gap-y-2">
           <p class="text-black font-bold tracking-widest text-sm">Price</p>
-          <p class="text-xs"><span>$</span>{{ priceRange$$().max }}</p>
+          <p class="text-black font-bold tracking-widest text-sm">From</p>
+          <p class="text-xs"><span>$</span>{{ selectedPriceFrom() }}</p>
           <input
             type="range"
             name="price"
             id="price"
             [min]="priceRange$$().min"
             [max]="priceRange$$().max"
-            [ngModel]="priceRange$$().max"
+            [(ngModel)]="selectedPriceFrom"
+          />
+          <p class="text-black font-bold tracking-widest text-sm">To</p>
+          <p class="text-xs"><span>$</span>{{ selectedPriceTo() }}</p>
+          <input
+            type="range"
+            name="price"
+            id="price"
+            [min]="priceRange$$().min"
+            [max]="priceRange$$().max"
+            [(ngModel)]="selectedPriceTo"
           />
         </div>
         <div class="flex justify-between">
           <p>Free Shipping</p>
-          <input type="checkbox" name="freeshiping" id="freeshiping" />
+          <input type="checkbox" name="freeshiping" id="freeshiping" [(ngModel)]="isFreeShip"/>
         </div>
-        <app-danger-button text="Clear Filters" />
+        <app-danger-button text="Clear Filters" (buttonClick)="clearFilterHandler()" />
       </nav>
       <section class="flex-1">
         <div class="flex gap-8">
@@ -125,14 +130,6 @@ import { HeaderNavComponent } from '../components/header-nav.component';
       </section>
     </main>
   `,
-  imports: [
-    SquareButtonComponent,
-    DangerButtonComponent,
-    JsonPipe,
-    BreadcrumbComponent,
-    FormsModule,
-    HeaderNavComponent,
-  ],
 })
 export class ProductListComponent {
   router = inject(Router);
@@ -141,22 +138,82 @@ export class ProductListComponent {
   appState = inject(AppStore);
 
   vm$$ = this.productListStore.vm$$;
-  categories$$ = this.appState.categories$$;
+  readonly categories$$ = this.appState.categories$$;
   companies$$ = this.appState.companies$$;
   colors$$ = this.appState.color$$;
   priceRange$$ = this.appState.priceRange$$;
 
   searchTerm = signal('');
+  selectedCategoryId = signal<number | undefined>(undefined);
+  selectedCategory = computed(() =>
+    this.categories$$().find(
+      (category) => category.id === this.selectedCategoryId()
+    )
+  );
+  selectedCompanyId = signal<string>('');
+  selectedCompany = computed(() =>
+    this.companies$$().find(
+      (company) => company.id === +this.selectedCompanyId()
+    )
+  );
+  selectedColorId = signal<number | undefined>(undefined);
+  selectedPriceFrom = signal<number | undefined>(this.priceRange$$().min);
+  selectedPriceTo = signal<number | undefined>(this.priceRange$$().max);
+  isFreeShip = signal<boolean | undefined>(false);
+  
 
   constructor() {
+    effect(() => this.selectedPriceTo.set(this.priceRange$$().max), {allowSignalWrites: true});
+    effect(() => this.selectedPriceFrom.set(this.priceRange$$().min), {allowSignalWrites: true});
+    // const queryParams = this.route.snapshot.queryParams;
+    // combineLatest([
+    //   toObservable(this.categories$$),
+    //   toObservable(this.companies$$),
+    // ])
+    //   .pipe(
+    //     filter(
+    //       ([categories, companies]) =>
+    //         categories.length > 0 && companies.length > 0
+    //     ),
+    //     first(),
+    //     map(([categories, companies]) => ({
+    //       catid: categories.find(
+    //         (category) => category.name === queryParams['category']
+    //       )?.id,
+    //       comid:
+    //         companies.find((company) => company.name === queryParams['company'])
+    //           ?.id + '',
+    //     })),
+    //     tap((value) => console.log(value))
+    //   )
+    //   .subscribe(({ catid, comid }) => {
+    //     this.selectedCategoryId.set(catid);
+    //     this.selectedCompanyId.set(comid || '');
+    //   });
     effect(
       () => {
+        const filter = {
+          query: this.searchTerm(),
+          categoryId: this.selectedCategoryId(),
+          companyId: Number(this.selectedCompanyId()),
+          colorId: this.selectedColorId(),
+          fromPrice: this.selectedPriceFrom() !== this.priceRange$$().min ? this.selectedPriceFrom() : undefined,
+          toPrice: this.selectedPriceTo() !== this.priceRange$$().max ? this.selectedPriceTo() : undefined,
+          isFreeShip: this.isFreeShip()
+        };
+        const rawQueryPrams = {
+          query: this.searchTerm(),
+          category: this.selectedCategory()?.name,
+          company: this.selectedCompany()?.name,
+        };
+        const queryParams = Object.fromEntries(
+          Object.entries(rawQueryPrams).filter(([v]) => !!v)
+        ) as { search: string; company?: string };
         this.router.navigate([], {
           relativeTo: this.route,
-          queryParams: { search: this.searchTerm() || null },
-          queryParamsHandling: 'merge',
+          queryParams,
         });
-        this.productListStore.setFilter({ query: this.searchTerm() });
+        this.productListStore.setFilter(filter);
       },
       {
         allowSignalWrites: true,
@@ -164,11 +221,16 @@ export class ProductListComponent {
     );
   }
 
-  filterCategory(categoryId?: number) {
-    console.log(
-      '🚀 ~ ProductListComponent ~ filterCategory ~ categoryId:',
-      categoryId
-    );
-    this.productListStore.setCategoryId({ categoryId });
+  onSubmit() {
+    console.log('Submit button clicked');
+  }
+  clearFilterHandler() {
+    this.searchTerm.set('');
+    this.selectedCategoryId.set(undefined);
+    this.selectedCompanyId.set('');
+    this.selectedColorId.set(undefined);
+    this.selectedPriceFrom.set(this.priceRange$$().min);
+    this.selectedPriceTo.set(this.priceRange$$().max);
+    this.isFreeShip.set(false);
   }
 }

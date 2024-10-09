@@ -18,12 +18,10 @@ export class ProductService {
     return this.httpClient.get<any>(this.BaseUrl);
   }
 
-  getProductsByFilter(query: string, categoryId?: number): Observable<any> {
-    let params: any = {
-      query,
-      categoryId: categoryId || 0,
-    };
-    // if (categoryId) params = { ...params, categoryId };
+  getProductsByFilter(params: {
+    query: string;
+    categoryId?: number;
+  }): Observable<any> {
     return this.httpClient.get(`${this.BaseUrl}/filter`, {
       params,
     });

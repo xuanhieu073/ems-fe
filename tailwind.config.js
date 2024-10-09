@@ -1,6 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{html,ts}"],
+  presets: [require('@spartan-ng/ui-core/hlm-tailwind-preset')],
+  content: [
+    "./src/**/*.{html,ts}",
+    "./REPLACE_WITH_PATH_TO_YOUR_COMPONENTS_DIRECTORY/**/*.{html,ts}"
+  ],
   theme: {
     extend: {},
   },

@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core';
 import { ComponentStore } from '@ngrx/component-store';
 import { debounceTime, switchMap, tap } from 'rxjs';
 import { ProductService } from '../services/product.service';
-import { ActivatedRoute } from '@angular/router';
 
 export type ProductListState = {
   isLoading: boolean;
@@ -10,8 +9,13 @@ export type ProductListState = {
   limit: number;
   offset: number;
   products: any;
-  query: string;
+  query?: string;
   categoryId?: number;
+  companyId?: number;
+  colorId?: number;
+  fromPrice?: number;
+  toPrice?: number;
+  isFreeShip?: boolean;
 };
 
 @Injectable()
@@ -29,7 +33,12 @@ export class ProductListStore extends ComponentStore<ProductListState> {
   params$ = this.select(
     this.select((s) => s.query),
     this.select((s) => s.categoryId),
-    (query, categoryId) => ({ query, categoryId })
+    this.select((s) => s.companyId),
+    this.select((s) => s.colorId),
+    this.select((s)=> s.fromPrice),
+    this.select(s => s.toPrice),
+    this.select(s => s.isFreeShip),
+    (query, categoryId, companyId, colorId, fromPrice, toPrice, isFreeShip) => ({ query, categoryId, companyId, colorId, fromPrice, toPrice, isFreeShip })
   );
 
   productService = inject(ProductService);
@@ -42,9 +51,7 @@ export class ProductListStore extends ComponentStore<ProductListState> {
       offset: 0,
       products: [],
       query: '',
-      categoryId: undefined,
     });
-    // this.fetcEffect(this.paginator$);
     this.fetchFilterEffect(this.params$);
   }
 
@@ -62,41 +69,44 @@ export class ProductListStore extends ComponentStore<ProductListState> {
     )
   );
 
-  fetchFilterEffect = this.effect<{ query: string; categoryId?: number }>(
-    (params$) =>
-      params$.pipe(
-        debounceTime(100),
-        switchMap(({ query, categoryId }) => {
-          console.log(
-            '🚀 ~ ProductListStore ~ switchMap ~ { query, categoryId }:',
-            { query, categoryId }
-          );
-          return this.productService.getProductsByFilter(query, categoryId);
-        }),
-        tap((products) => {
-          this.patchState({
-            products,
-          });
-        })
-      )
+  fetchFilterEffect = this.effect<{
+    query?: string;
+    categoryId?: number;
+    companyId?: number;
+    colorId?: number;
+  }>((params$) =>
+    params$.pipe(
+      debounceTime(100),
+      switchMap((rawparams) => {
+        const params = Object.fromEntries(
+          Object.entries(rawparams).filter(([_, v]) => !!v)
+        ) as { query: string; categoryId?: number };
+        return this.productService.getProductsByFilter(params);
+      }),
+      tap((products) => {
+        this.patchState({
+          products,
+        });
+      })
+    )
   );
 
-  setFilter = this.updater<{ query: string }>((state, { query }) => ({
+  setFilter = this.updater<{
+    query?: string;
+    categoryId?: number;
+    companyId?: number;
+    colorId?: number;
+    fromPrice?: number;
+    toPrice?: number;
+    isFreeShip?: boolean;
+  }>((state, { query, categoryId, companyId, colorId, fromPrice, toPrice, isFreeShip }) => ({
     ...state,
     query,
+    categoryId,
+    companyId,
+    colorId,
+    fromPrice,
+    toPrice,
+    isFreeShip
   }));
-
-  setCategoryId = this.updater<{ categoryId?: number }>(
-    (state, { categoryId }) => ({
-      ...state,
-      categoryId,
-    })
-  );
-
-  setCompanyId = this.updater<{ companyId?: number }>(
-    (state, { companyId }) => ({
-      ...state,
-      companyId,
-    })
-  );
 }
