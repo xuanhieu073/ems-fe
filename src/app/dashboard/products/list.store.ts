@@ -7,20 +7,19 @@ import { debounceTime, distinctUntilChanged, pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/component-store';
 // import { tapResponse } from '@ngrx/operators';
 
-type BooksState = {
+type ProductsState = {
   products: Product[];
   isLoading: boolean;
   filter: { query: string; order: 'asc' | 'desc' };
 };
 
-const initialState: BooksState = {
+const initialState: ProductsState = {
   products: [],
   isLoading: false,
   filter: { query: '', order: 'asc' },
 };
 
 export const ProductStore = signalStore(
-  // { providedIn: 'root' },
   withState(initialState),
   withMethods((store, productService = inject(ProductService)) => ({
     updateQuery(query: string): void {

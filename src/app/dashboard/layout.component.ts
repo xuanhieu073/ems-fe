@@ -4,6 +4,10 @@ import { HlmButtonDirective } from '@spartan-ng/ui-button-helm';
 import { AuthStore } from '../store/auth.store';
 import { HlmSeparatorDirective } from '@spartan-ng/ui-separator-helm';
 import { BrnSeparatorComponent } from '@spartan-ng/ui-separator-brain';
+import { HlmIconComponent, provideIcons } from '@spartan-ng/ui-icon-helm';
+import { lucideChevronLeft } from '@ng-icons/lucide';
+import { Location } from '@angular/common';
+import { HlmToasterComponent } from '../../../ui-sonner-helm/src/lib/hlm-toaster.component';
 
 @Component({
   standalone: true,
@@ -14,7 +18,10 @@ import { BrnSeparatorComponent } from '@spartan-ng/ui-separator-brain';
     HlmButtonDirective,
     BrnSeparatorComponent,
     HlmSeparatorDirective,
+    HlmIconComponent,
+    HlmToasterComponent,
   ],
+  providers: [provideIcons({ lucideChevronLeft })],
   template: `
     <div class="flex">
       <div class="w-[200px] h-screen border-r">
@@ -39,22 +46,40 @@ import { BrnSeparatorComponent } from '@spartan-ng/ui-separator-brain';
               Users
             </div>
             <brn-separator hlmSeparator />
-            <div>Source</div>
+            <div
+              class="cursor-pointer"
+              routerLink="/dashboard/seed"
+              routerLinkActive="font-bold"
+            >
+              Seed
+            </div>
           </div>
         </div>
       </div>
       <div class="flex-1">
-        <nav class="px-6 h-14 flex items-center justify-end w-full border-b">
+        <nav
+          class="px-6 h-14 flex items-center justify-between w-full border-b"
+        >
+          <button variant="ghost" hlmBtn (click)="goBack()">
+            <hlm-icon size="sm" name="lucideChevronLeft" />
+          </button>
           <button type="submit" hlmBtn (click)="logout()">Logout</button>
         </nav>
-        <router-outlet />
+        <div class="p-6 relative">
+          <router-outlet />
+        </div>
       </div>
     </div>
+    <hlm-toaster />
   `,
 })
 export class DashboardLayoutComponent {
   authStore = inject(AuthStore);
+  location = inject(Location);
+  goBack() {
+    this.location.back();
+  }
   logout() {
-    this.authStore.setAccessToken({ accessToken: '' });
+    this.authStore.logoutEffect();
   }
 }

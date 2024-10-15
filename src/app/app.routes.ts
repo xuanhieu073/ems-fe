@@ -16,11 +16,6 @@ export const routes: Routes = [
       import('./products/list.component').then((m) => m.ProductListComponent),
   },
   {
-    path: 'seed',
-    loadComponent: () =>
-      import('./seed/seed.component').then((m) => m.SeedComponent),
-  },
-  {
     path: 'login',
     loadComponent: () =>
       import('./login/login.component').then((m) => m.LoginComponent),
@@ -40,11 +35,30 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'products/details/:slug',
+        loadComponent: () =>
+          import('./dashboard/products/details.component').then(
+            (m) => m.DetailsComponent
+          ),
+      },
+      {
+        path: 'products/create',
+        loadComponent: () =>
+          import('./dashboard/products/create.component').then(
+            (m) => m.CreateComponent
+          ),
+      },
+      {
         path: 'users',
         loadComponent: () =>
           import('./dashboard/users/list.component').then(
             (m) => m.DashboardUserListComponent
           ),
+      },
+      {
+        path: 'seed',
+        loadComponent: () =>
+          import('./seed/seed.component').then((m) => m.SeedComponent),
       },
     ],
   },

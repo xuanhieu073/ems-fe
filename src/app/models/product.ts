@@ -8,6 +8,9 @@ export type Product = {
   rating: number;
   description: string;
   freeShip: boolean;
+  categoryId: number;
   category: Category;
+  companyId: number;
   company: Company;
+  colorsId: number[];
 };

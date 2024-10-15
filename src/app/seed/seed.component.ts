@@ -95,12 +95,12 @@ export class SeedComponent {
       products.map((product) => this.seedService.seedProduct(product))
     );
 
-    seedCatObs
-      .pipe(
-        switchMap((catrs) => seedComObs),
-        switchMap((comrs) => seedClsObs),
-        switchMap((clsrs) => seedProduct)
-      )
-      .subscribe((result) => console.log(result));
+    // seedCatObs
+    // .pipe(
+    //   switchMap((catrs) => seedComObs),
+    //   switchMap((comrs) => seedClsObs),
+    //   switchMap((clsrs) => seedProduct)
+    // )
+    // seedProduct.subscribe((result) => console.log(result));
   }
 }

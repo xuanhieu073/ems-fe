@@ -10,6 +10,8 @@ import { HlmButtonDirective } from '@spartan-ng/ui-button-helm';
 import { HlmInputDirective } from '@spartan-ng/ui-input-helm';
 import { AuthenticationService } from '../services/authentication.service';
 import { AuthStore } from '../store/auth.store';
+import { of } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -69,6 +71,7 @@ import { AuthStore } from '../store/auth.store';
 export class LoginComponent {
   private authenticationService = inject(AuthenticationService);
   private authStore = inject(AuthStore);
+  private router = inject(Router);
 
   loginForm = new FormGroup({
     username: new FormControl('', [
@@ -94,6 +97,7 @@ export class LoginComponent {
       .login(this.loginForm.value.username!, this.loginForm.value.password!)
       .subscribe((res) => {
         this.authStore.setAccessToken({ accessToken: res.accessToken });
+        this.router.navigate(['/dashboard/products']);
       });
   }
 }

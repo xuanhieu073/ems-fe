@@ -31,11 +31,13 @@ import {
   lucideArrowUpDown,
   lucideChevronDown,
   lucideMoreHorizontal,
+  lucidePlus,
 } from '@ng-icons/lucide';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Product } from '../../models/product';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ProductStore } from './list.store';
+import { RouterLink } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -60,17 +62,20 @@ import { ProductStore } from './list.store';
 
     BrnSelectModule,
     HlmSelectModule,
+
+    RouterLink,
   ],
   providers: [
     provideIcons({
       lucideChevronDown,
       lucideMoreHorizontal,
       lucideArrowUpDown,
+      lucidePlus,
     }),
     ProductStore,
   ],
   template: `
-    <div class="p-6">
+    <div>
       <div class="flex flex-col justify-between gap-4 sm:flex-row">
         <input
           hlmInput
@@ -79,30 +84,40 @@ import { ProductStore } from './list.store';
           [ngModel]="_emailFilter()"
           (ngModelChange)="store.updateQuery($event)"
         />
-        <button hlmBtn variant="outline" align="end" [brnMenuTriggerFor]="menu">
-          Columns
-          <hlm-icon name="lucideChevronDown" class="ml-2" size="sm" />
-        </button>
-        <ng-template #menu>
-          <hlm-menu class="w-32">
-            @for (column of _brnColumnManager.allColumns; track column.name) {
-            <button
-              hlmMenuItemCheckbox
-              [disabled]="_brnColumnManager.isColumnDisabled(column.name)"
-              [checked]="_brnColumnManager.isColumnVisible(column.name)"
-              (triggered)="_brnColumnManager.toggleVisibility(column.name)"
-            >
-              <hlm-menu-item-check />
-              <span>{{ column.label }}</span>
-            </button>
-            }
-          </hlm-menu>
-        </ng-template>
+        <div class="flex gap-x-2 items-center">
+          <button hlmBtn routerLink="create">
+            <hlm-icon size="sm" name="lucidePlus"></hlm-icon>
+          </button>
+          <button
+            hlmBtn
+            variant="outline"
+            align="end"
+            [brnMenuTriggerFor]="menu"
+          >
+            Columns
+            <hlm-icon name="lucideChevronDown" class="ml-2" size="sm" />
+          </button>
+          <ng-template #menu>
+            <hlm-menu class="w-32">
+              @for (column of _brnColumnManager.allColumns; track column.name) {
+              <button
+                hlmMenuItemCheckbox
+                [disabled]="_brnColumnManager.isColumnDisabled(column.name)"
+                [checked]="_brnColumnManager.isColumnVisible(column.name)"
+                (triggered)="_brnColumnManager.toggleVisibility(column.name)"
+              >
+                <hlm-menu-item-check />
+                <span>{{ column.label }}</span>
+              </button>
+              }
+            </hlm-menu>
+          </ng-template>
+        </div>
       </div>
       <brn-table
         hlm
         stickyHeader
-        class="border-border mt-4 block h-[335px] overflow-auto rounded-md border"
+        class="border-border mt-4 block overflow-auto rounded-md border"
         [dataSource]="store.products()"
         [displayedColumns]="_allDisplayedColumns()"
         [trackBy]="_trackBy"
@@ -127,26 +142,16 @@ import { ProductStore } from './list.store';
             {{ element.name | titlecase }}
           </hlm-td>
         </brn-column-def>
-        <brn-column-def name="price" class="w-60 lg:flex-1">
-          <hlm-th *brnHeaderDef>
-            <button
-              hlmBtn
-              size="sm"
-              variant="ghost"
-              (click)="handleEmailSortChange()"
-            >
-              Price
-              <hlm-icon class="ml-3" size="sm" name="lucideArrowUpDown" />
-            </button>
-          </hlm-th>
+        <brn-column-def name="description" class="w-32 sm:flex-1">
+          <hlm-th truncate *brnHeaderDef>Description</hlm-th>
           <hlm-td truncate *brnCellDef="let element">
-            {{ element.price }}
+            {{ element.description }}
           </hlm-td>
         </brn-column-def>
-        <brn-column-def name="amount" class="w-20">
-          <hlm-th *brnHeaderDef>Amount</hlm-th>
+        <brn-column-def name="price" class="w-36">
+          <hlm-th *brnHeaderDef>Price</hlm-th>
           <hlm-td class="font-medium tabular-nums" *brnCellDef="let element">
-            $ {{ element.amount | number : '1.2-2' }}
+            $ {{ element.price | number : '1.2-2' }}
           </hlm-td>
         </brn-column-def>
         <brn-column-def name="actions" class="w-16">
@@ -166,12 +171,12 @@ import { ProductStore } from './list.store';
                 <hlm-menu-label>Actions</hlm-menu-label>
                 <hlm-menu-separator />
                 <hlm-menu-group>
-                  <button hlmMenuItem>Copy payment ID</button>
+                  <button hlmMenuItem [routerLink]="['details', element.id]">
+                    Edit
+                  </button>
                 </hlm-menu-group>
-                <hlm-menu-separator />
                 <hlm-menu-group>
-                  <button hlmMenuItem>View customer</button>
-                  <button hlmMenuItem>View payment details</button>
+                  <button hlmMenuItem>Dedlete</button>
                 </hlm-menu-group>
               </hlm-menu>
             </ng-template>
@@ -197,7 +202,7 @@ import { ProductStore } from './list.store';
           >{{ _selected().length }} of {{ _totalElements() }} row(s)
           selected</span
         >
-        <div class="flex mt-2 sm:mt-0">
+        <div class="hidden mt-2 sm:mt-0">
           <brn-select
             class="inline-block"
             placeholder="{{ _availablePageSizes[0] }}"
@@ -248,7 +253,11 @@ export class DashboardProductListComponent implements OnInit {
   private readonly _selectionModel = new SelectionModel<Product>(true);
 
   protected readonly _selected = toSignal(
-    this._selectionModel.changed.pipe(map((change) => change.source.selected)),
+    this._selectionModel.changed.pipe(
+      map((change) => {
+        return change.source.selected;
+      })
+    ),
     {
       initialValue: [],
     }
@@ -256,13 +265,9 @@ export class DashboardProductListComponent implements OnInit {
 
   protected readonly _brnColumnManager = useBrnColumnManager({
     name: { visible: true, label: 'Name' },
-    price: { visible: true, label: 'Price' },
-    amount: { visible: true, label: 'Amount ($)' },
+    description: { visible: true, label: 'Description' },
+    price: { visible: true, label: 'Price ($)' },
   });
-
-  // protected readonly _filteredSortedPaginatedPayments = computed(() => {
-  //   return this.productService.getProductsByFilter({ query: '' });
-  // });
 
   protected readonly _allDisplayedColumns = computed(() => [
     'select',
@@ -273,35 +278,31 @@ export class DashboardProductListComponent implements OnInit {
   protected readonly _trackBy: TrackByFunction<any> = (_: number, p: any) =>
     p.id;
 
-  protected readonly _allFilteredPaginatedPaymentsSelected = computed(
-    () =>
-      // this._filteredSortedPaginatedPayments().every((payment) =>
-      //   this._selected().includes(payment)
-      // )
-      false
+  protected readonly _allProductsSelected = computed(() =>
+    this.store.products().every((product) => this._selected().includes(product))
   );
 
   protected readonly _checkboxState = computed(() => {
     const noneSelected = this._selected().length === 0;
-    const allSelectedOrIndeterminate =
-      this._allFilteredPaginatedPaymentsSelected() ? true : 'indeterminate';
+    const allSelectedOrIndeterminate = this._allProductsSelected()
+      ? true
+      : 'indeterminate';
     return noneSelected ? false : allSelectedOrIndeterminate;
-    // return true ? 'indeterminate' : false;
   });
 
   protected handleHeaderCheckboxChange() {
     const previousCbState = this._checkboxState();
     if (previousCbState === 'indeterminate' || !previousCbState) {
-      // this._selectionModel.select(...this._filteredSortedPaginatedPayments());
+      this._selectionModel.select(...this.store.products());
     } else {
-      // this._selectionModel.deselect(...this._filteredSortedPaginatedPayments());
+      this._selectionModel.deselect(...this.store.products());
     }
   }
-  protected readonly _isPaymentSelected = (payment: any) => true;
-  // this._selectionModel.isSelected(payment);
+  protected readonly _isPaymentSelected = (product: any) =>
+    this._selectionModel.isSelected(product);
 
-  protected togglePayment(payment: any) {
-    // this._selectionModel.toggle(payment);
+  protected togglePayment(product: any) {
+    this._selectionModel.toggle(product);
   }
 
   protected handleEmailSortChange() {

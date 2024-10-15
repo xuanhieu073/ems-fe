@@ -16,11 +16,11 @@ export class AuthStore extends ComponentStore<AuthState> {
   router = inject(Router);
 
   accessToken$ = this.select((s) => s.accessToken);
+  authToken$ = this.select((s) => `Bearer ${s.accessToken}`);
 
   constructor() {
     super({ accessToken: '' });
     this.initializeEffect();
-    this.navEffect(this.accessToken$);
     this.saveEffect(this.accessToken$);
   }
   initializeEffect = this.effect((trigger$) =>
@@ -40,11 +40,10 @@ export class AuthStore extends ComponentStore<AuthState> {
     )
   );
 
-  navEffect = this.effect<string>((trigger$) =>
+  logoutEffect = this.effect((trigger$) =>
     trigger$.pipe(
-      tap((accessToken) => {
-        if (accessToken) this.router.navigate(['/dashboard/products']);
-        else this.router.navigate(['/']);
+      tap(() => {
+        this.router.navigate(['/']);
       })
     )
   );

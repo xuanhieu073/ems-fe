@@ -1,5 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { AuthStore } from '../store/auth.store';
+import { map, of, switchMap } from 'rxjs';
 
 type Category = {
   name: string;
@@ -30,35 +32,58 @@ type Product = {
 })
 export class SeedService {
   private http = inject(HttpClient);
+  private authStore = inject(AuthStore);
   private baseUrl = 'http://localhost:8080/api';
-  private token =
-    'Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcyODEzNjE0NCwiZXhwIjoxNzI4NzQwOTQ0fQ.sbXAcXZN4EofVAsutcLokVpuCwdw-jfMZKV0KuWXnQ4EEC5HVvIl5Yq6zEWvQQS8';
-  private headers = {
-    Authorization: this.token,
-    'content-type': 'application/json',
-  };
+
+  // private headers = {
+  //   Authorization: this.authStore.authToken$.toPromise(),
+  //   'content-type': 'application/json',
+  // };
+
+  headers$ = this.authStore.authToken$.pipe(
+    map((authToken) => ({
+      Authorization: authToken,
+      'content-type': 'application/json',
+    }))
+  );
 
   seedCategory(body: Category) {
-    return this.http.post(`${this.baseUrl}/categories`, body, {
-      headers: this.headers,
-    });
+    return this.headers$.pipe(
+      switchMap((headers) =>
+        this.http.post(`${this.baseUrl}/categories`, body, {
+          headers,
+        })
+      )
+    );
   }
 
   seedCompany(body: Company) {
-    return this.http.post(`${this.baseUrl}/companies`, body, {
-      headers: this.headers,
-    });
+    return this.headers$.pipe(
+      switchMap((headers) =>
+        this.http.post(`${this.baseUrl}/companies`, body, {
+          headers,
+        })
+      )
+    );
   }
 
   seedColor(body: Color) {
-    return this.http.post(`${this.baseUrl}/colors`, body, {
-      headers: this.headers,
-    });
+    return this.headers$.pipe(
+      switchMap((headers) =>
+        this.http.post(`${this.baseUrl}/colors`, body, {
+          headers,
+        })
+      )
+    );
   }
 
   seedProduct(body: Product) {
-    return this.http.post(`${this.baseUrl}/products`, body, {
-      headers: this.headers,
-    });
+    return this.headers$.pipe(
+      switchMap((headers) =>
+        this.http.post(`${this.baseUrl}/products`, body, {
+          headers,
+        })
+      )
+    );
   }
 }
