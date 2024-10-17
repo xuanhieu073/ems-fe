@@ -1,4 +1,5 @@
-import { HttpClient } from '@angular/common/http';
+import { User } from './../models/user';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 
@@ -15,6 +16,19 @@ export class AuthenticationService {
         usernameOrEmail,
         password,
       }
+    );
+  }
+
+  register(username: string, email: string, name: string, password: string) {
+    return this.httpClient.post<string>(
+      `${environment.apiUrl}/auth/register`,
+      {
+        username,
+        email,
+        name,
+        password,
+      },
+      { responseType: 'text' as 'json' }
     );
   }
 }

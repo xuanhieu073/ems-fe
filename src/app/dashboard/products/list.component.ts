@@ -8,7 +8,10 @@ import {
   TrackByFunction,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HlmButtonModule } from '@spartan-ng/ui-button-helm';
+import {
+  HlmButtonDirective,
+  HlmButtonModule,
+} from '@spartan-ng/ui-button-helm';
 import {
   HlmCheckboxCheckIconComponent,
   HlmCheckboxComponent,
@@ -25,7 +28,7 @@ import {
   useBrnColumnManager,
 } from '@spartan-ng/ui-table-brain';
 import { HlmTableModule } from '@spartan-ng/ui-table-helm';
-import { BehaviorSubject, map } from 'rxjs';
+import { BehaviorSubject, debounceTime, map, tap } from 'rxjs';
 import { ProductService } from '../../services/product.service';
 import {
   lucideArrowUpDown,
@@ -35,9 +38,24 @@ import {
 } from '@ng-icons/lucide';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Product } from '../../models/product';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ProductStore } from './list.store';
 import { RouterLink } from '@angular/router';
+import {
+  BrnAlertDialogContentDirective,
+  BrnAlertDialogTriggerDirective,
+} from '@spartan-ng/ui-alertdialog-brain';
+import {
+  HlmAlertDialogActionButtonDirective,
+  HlmAlertDialogCancelButtonDirective,
+  HlmAlertDialogComponent,
+  HlmAlertDialogContentComponent,
+  HlmAlertDialogDescriptionDirective,
+  HlmAlertDialogFooterComponent,
+  HlmAlertDialogHeaderComponent,
+  HlmAlertDialogOverlayDirective,
+  HlmAlertDialogTitleDirective,
+} from '@spartan-ng/ui-alertdialog-helm';
 
 @Component({
   standalone: true,
@@ -64,6 +82,21 @@ import { RouterLink } from '@angular/router';
     HlmSelectModule,
 
     RouterLink,
+
+    BrnAlertDialogTriggerDirective,
+    BrnAlertDialogContentDirective,
+
+    HlmAlertDialogComponent,
+    HlmAlertDialogOverlayDirective,
+    HlmAlertDialogHeaderComponent,
+    HlmAlertDialogFooterComponent,
+    HlmAlertDialogTitleDirective,
+    HlmAlertDialogDescriptionDirective,
+    HlmAlertDialogCancelButtonDirective,
+    HlmAlertDialogActionButtonDirective,
+    HlmAlertDialogContentComponent,
+
+    HlmButtonDirective,
   ],
   providers: [
     provideIcons({
@@ -176,7 +209,12 @@ import { RouterLink } from '@angular/router';
                   </button>
                 </hlm-menu-group>
                 <hlm-menu-group>
-                  <button hlmMenuItem>Dedlete</button>
+                  <button
+                    hlmMenuItem
+                    (click)="confirmDeleteProduct(element.id)"
+                  >
+                    Delete
+                  </button>
                 </hlm-menu-group>
               </hlm-menu>
             </ng-template>
@@ -242,6 +280,23 @@ import { RouterLink } from '@angular/router';
         </div>
       </div>
     </div>
+    <hlm-alert-dialog [state]="state()" (closed)="state.set('closed')">
+      <hlm-alert-dialog-content *brnAlertDialogContent="let ctx">
+        <hlm-alert-dialog-header>
+          <h3 hlmAlertDialogTitle>Are you absolutely sure?</h3>
+          <p hlmAlertDialogDescription>
+            This action cannot be undone. This will permanently delete your
+            product and remove your data from our servers.
+          </p>
+        </hlm-alert-dialog-header>
+        <hlm-alert-dialog-footer>
+          <button hlmAlertDialogCancel (click)="ctx.close()">Cancel</button>
+          <button hlmAlertDialogAction (click)="ctx.close(); deleteProduct()">
+            Delete product
+          </button>
+        </hlm-alert-dialog-footer>
+      </hlm-alert-dialog-content>
+    </hlm-alert-dialog>
   `,
 })
 export class DashboardProductListComponent implements OnInit {
@@ -251,6 +306,9 @@ export class DashboardProductListComponent implements OnInit {
   protected readonly _availablePageSizes = [5, 10, 20, 10000];
   protected readonly _pageSize = signal(this._availablePageSizes[0]);
   private readonly _selectionModel = new SelectionModel<Product>(true);
+
+  protected state = signal<'closed' | 'open'>('closed');
+  protected deleteProductId = signal<number | undefined>(undefined);
 
   protected readonly _selected = toSignal(
     this._selectionModel.changed.pipe(
@@ -270,7 +328,7 @@ export class DashboardProductListComponent implements OnInit {
   });
 
   protected readonly _allDisplayedColumns = computed(() => [
-    'select',
+    // 'select',
     ...this._brnColumnManager.displayedColumns(),
     'actions',
   ]);
@@ -338,5 +396,23 @@ export class DashboardProductListComponent implements OnInit {
   ngOnInit(): void {
     const query = this.store.filter.query;
     this.store.loadByQuery(query);
+  }
+
+  confirmDeleteProduct(id: number) {
+    this.deleteProductId.set(id);
+    this.state.set('open');
+  }
+
+  deleteProduct() {
+    const productId = this.deleteProductId() || 0;
+    this.productService
+      .deleteProduct(productId)
+      .pipe(
+        tap((res) => {
+          this.store.deleteById(productId);
+          this.deleteProductId.set(undefined);
+        })
+      )
+      .subscribe(() => {});
   }
 }

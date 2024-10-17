@@ -61,4 +61,15 @@ export class ProductService {
       )
     );
   }
+
+  deleteProduct(productId: number) {
+    return this.headers$.pipe(
+      switchMap((headers) =>
+        this.httpClient.delete(`${this.BaseUrl}/${productId}`, {
+          headers,
+          responseType: 'text' as 'json',
+        })
+      )
+    );
+  }
 }

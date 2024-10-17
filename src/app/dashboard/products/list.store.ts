@@ -43,5 +43,11 @@ export const ProductStore = signalStore(
         })
       )
     ),
+    deleteById(id: number): void {
+      patchState(store, (state) => {
+        const products = state.products.filter((product) => product.id !== id);
+        return { products };
+      });
+    },
   }))
 );

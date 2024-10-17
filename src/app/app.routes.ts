@@ -55,11 +55,11 @@ export const routes: Routes = [
             (m) => m.DashboardUserListComponent
           ),
       },
-      {
-        path: 'seed',
-        loadComponent: () =>
-          import('./seed/seed.component').then((m) => m.SeedComponent),
-      },
+      // {
+      //   path: 'seed',
+      //   loadComponent: () =>
+      //     import('./seed/seed.component').then((m) => m.SeedComponent),
+      // },
     ],
   },
 ];

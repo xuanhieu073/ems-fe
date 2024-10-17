@@ -25,7 +25,7 @@ import { HlmToasterComponent } from '../../../ui-sonner-helm/src/lib/hlm-toaster
   template: `
     <div class="flex">
       <div class="w-[200px] h-screen border-r">
-        <div>
+        <!-- <div>
           <div class="h-14 space-y-1 border-b flex items-center justify-center">
             <h4 class="text-sm font-medium leading-none">Dashbard</h4>
           </div>
@@ -52,6 +52,33 @@ import { HlmToasterComponent } from '../../../ui-sonner-helm/src/lib/hlm-toaster
               routerLinkActive="font-bold"
             >
               Seed
+            </div>
+          </div>
+        </div> -->
+        <div class="space-y-4 py-4">
+          <div class="px-3 py-2">
+            <h2 class="mb-2 px-4 text-lg font-semibold tracking-tight">
+              Dashboard
+            </h2>
+            <div class="space-y-1">
+              <button
+                routerLink="/dashboard/products"
+                routerLinkActive="bg-zinc-100"
+                variant="ghost"
+                class="w-full justify-start"
+                hlmBtn
+              >
+                Products
+              </button>
+              <button
+                routerLink="/dashboard/users"
+                routerLinkActive="bg-zinc-100"
+                variant="ghost"
+                class="w-full justify-start"
+                hlmBtn
+              >
+                Users
+              </button>
             </div>
           </div>
         </div>
