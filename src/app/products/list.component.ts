@@ -1,7 +1,7 @@
 import { JsonPipe } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BreadcrumbComponent } from '../components/breadcrumb.component';
 import { DangerButtonComponent } from '../components/danger-button.component';
 import { HeaderNavComponent } from '../components/header-nav.component';
@@ -17,11 +17,11 @@ import { ProductListStore } from './list.store';
   imports: [
     SquareButtonComponent,
     DangerButtonComponent,
-    JsonPipe,
     BreadcrumbComponent,
     FormsModule,
     HeaderNavComponent,
     SelectListComponent,
+    RouterLink,
   ],
   template: `
     <app-header-nav />
@@ -125,7 +125,7 @@ import { ProductListStore } from './list.store';
         </div>
         <div class="grid grid-cols-3 gap-3">
           @for(product of vm$$().products; track product.id) {
-          <div>
+          <div [routerLink]="['/products/'+product.id]">
             <img
               class="w-full h-[165px] object-cover rounded-md"
               src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1858&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"

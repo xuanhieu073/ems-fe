@@ -47,13 +47,13 @@ export class FeaturedProductsComponent {
       price: '399.99',
     },
     {
-      id: 1,
+      id: 2,
       image: '/commerce/product-7.jpeg',
       name: 'Hight-Back Bench',
       price: '399.99',
     },
     {
-      id: 1,
+      id: 3,
       image: '/commerce/product-7.jpeg',
       name: 'Modern Bookshelf',
       price: '399.99',

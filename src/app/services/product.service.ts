@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { map, Observable, switchMap } from 'rxjs';
 import { Product } from '../models/product';
 import { AuthStore } from '../store/auth.store';
+import { environment } from '../../environments/environment';
 
 export type PriceRange = {
   min: number;
@@ -13,7 +14,7 @@ export type PriceRange = {
   providedIn: 'root',
 })
 export class ProductService {
-  private readonly BaseUrl = 'http://localhost:8080/api/products';
+  private readonly BaseUrl = `${environment.apiUrl}/products`;
   httpClient = inject(HttpClient);
   authStore = inject(AuthStore);
 

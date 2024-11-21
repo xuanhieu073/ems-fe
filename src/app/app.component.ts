@@ -8,8 +8,6 @@ import { ProductListComponent } from './products/list.component';
   standalone: true,
   imports: [
     RouterOutlet,
-    BreadcrumbComponent,
-    ProductListComponent,
     RouterOutlet,
   ],
   template: ` <router-outlet /> `,

@@ -1,9 +1,11 @@
+import { RouterLink } from '@angular/router';
 import { Component } from '@angular/core';
 import { ButtonComponent } from '../components/button.component';
 
 @Component({
   standalone: true,
   selector: 'home-hero',
+  imports: [ButtonComponent, RouterLink],
   template: `
     <div class="px-4 py-[217px] max-w-[1170px] mx-auto">
       <div class="flex gap-[140px]">
@@ -22,7 +24,7 @@ import { ButtonComponent } from '../components/button.component';
             checkout allows you to pay with your Debit / Credit cards using
             Stripe payments.
           </p>
-          <app-button text="SHOW NOW" />
+          <app-button routerLink="/products" text="SHOW NOW" ></app-button>
         </div>
         <div
           class="flex-shrink-0 pt-7 relative after:content-[''] after:absolute after:bottom-0 after:-left-11 after:w-11 after:h-[440px] after:bg-[#decbc0] -z-10"
@@ -41,6 +43,5 @@ import { ButtonComponent } from '../components/button.component';
       </div>
     </div>
   `,
-  imports: [ButtonComponent],
 })
 export class HeroComponent {}
