@@ -12,7 +12,7 @@ export type Company = {
 export class CompanyService {
   httpClient = inject(HttpClient);
 
-  private readonly BaseUrl = `http://${environment.apiUrl}/api/companies`;
+  private readonly BaseUrl = `${environment.apiUrl}/companies`;
 
   getCompanies(): Observable<Company[]> {
     return this.httpClient.get<Company[]>(this.BaseUrl);

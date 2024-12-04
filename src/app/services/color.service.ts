@@ -13,7 +13,7 @@ export type Color = {
 export class ColorService {
   httpClient = inject(HttpClient);
 
-  private readonly BaseUrl = `http://${environment.apiUrl}/api/colors`;
+  private readonly BaseUrl = `${environment.apiUrl}/colors`;
 
   getColors(): Observable<Color[]> {
     return this.httpClient.get<Color[]>(this.BaseUrl);

@@ -34,7 +34,7 @@ type Product = {
 export class SeedService {
   private http = inject(HttpClient);
   private authStore = inject(AuthStore);
-  private baseUrl = `http://${environment.apiUrl}/api`;
+  private baseUrl = `${environment.apiUrl}`;
 
   // private headers = {
   //   Authorization: this.authStore.authToken$.toPromise(),
