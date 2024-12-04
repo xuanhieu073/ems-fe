@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export type Company = {
   id: number;
@@ -11,7 +12,7 @@ export type Company = {
 export class CompanyService {
   httpClient = inject(HttpClient);
 
-  private readonly BaseUrl = 'http://localhost:8080/api/companies';
+  private readonly BaseUrl = `http://${environment.apiUrl}/api/companies`;
 
   getCompanies(): Observable<Company[]> {
     return this.httpClient.get<Company[]>(this.BaseUrl);

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export type Color = {
   id: number;
@@ -12,7 +13,7 @@ export type Color = {
 export class ColorService {
   httpClient = inject(HttpClient);
 
-  private readonly BaseUrl = 'http://localhost:8080/api/colors';
+  private readonly BaseUrl = `http://${environment.apiUrl}/api/colors`;
 
   getColors(): Observable<Color[]> {
     return this.httpClient.get<Color[]>(this.BaseUrl);

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { AuthStore } from '../store/auth.store';
 import { map, of, switchMap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 type Category = {
   name: string;
@@ -33,7 +34,7 @@ type Product = {
 export class SeedService {
   private http = inject(HttpClient);
   private authStore = inject(AuthStore);
-  private baseUrl = 'http://localhost:8080/api';
+  private baseUrl = `http://${environment.apiUrl}/api`;
 
   // private headers = {
   //   Authorization: this.authStore.authToken$.toPromise(),
