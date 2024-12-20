@@ -1,6 +1,6 @@
 def installPackage() {
     echo "install packages"
-    sh "npm install"
+    sh "npm install --force"
 }
 
 def buildDist() {
