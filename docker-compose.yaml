@@ -1,0 +1,6 @@
+version: '3.8'
+services:
+  ems-fe:
+    image: xuanhieu073/ems-fe:1.0
+    ports:
+      - 80:80
